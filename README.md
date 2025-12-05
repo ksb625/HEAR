@@ -1,5 +1,5 @@
 # HEAR
-HEAR : Hybrid audio restoration Enhancement with Adaptive Reinforcement
+HEAR 📢: Hybrid audio restoration Enhancement with Adaptive Reinforcement
 🎧 RL-based Multi-step Speech Denoising
 
 Reinforcement Learning based Multi-step Speech Denoising System
