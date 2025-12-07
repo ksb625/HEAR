@@ -1,0 +1,60 @@
+# Exclude large data directories
+train_data/
+weight/
+runs/
+wandb/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Exclude data files
+*.wav
+*.mp3
+*.flac
+*.pcm
+*.zip
+*.tar
+*.tar.gz
+
+# Exclude large datasets
+KsponSpeech_*/
+data_mixed/
+noise/
+noise_select/
+
+# Exclude model checkpoints (will be mounted or copied separately)
+*.pt
+*.pth
+*.ckpt
+
+# Exclude logs and outputs
+*.log
+*.csv
+# Note: JSON files are excluded, but args.json in runs/ will be needed
+# If you need specific JSON files, add exceptions like: !path/to/needed.json
+
+# Exclude git
+.git/
+.gitignore
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
+# Exclude temporary files
+*.tmp
+*.bak
+*.cache
+
+# Note: Python files (*.py) are included by default
+# If you need specific JSON/CSV files, add exceptions before the exclusion rules
+
