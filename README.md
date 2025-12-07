@@ -179,8 +179,8 @@ python -m rl.train_agent \
 ```bash
 # 단일 모델 추론
 python inference.py \
-    --checkpoint runs/rl_train/model.pt \
-    --input train_data/noisy/sample.wav \
+    --checkpoint weight/model.pt \
+    --input data_sample/noisy_1.wav\
     --output denoised_output.wav
 ```
 
