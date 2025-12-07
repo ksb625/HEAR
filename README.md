@@ -316,12 +316,27 @@ python utils/denoise_metrics.py \
 다음은 denoising 전후의 오디오 샘플입니다:
 
 ### Sample 1
-- **Clean (원본)**: [clean_1.wav](data_sample/clean_1.wav)
-- **Noisy (노이즈 포함)**: [noisy_1.wav](data_sample/noisy_1.wav)
-- **Denoised (처리 후)**: [denoise_1.wav](data_sample/denoise_1.wav)
+- **Clean (원본)**
+  <audio controls src="data_sample/clean_1.wav"></audio>
+  [다운로드](data_sample/clean_1.wav)
+
+- **Noisy (노이즈 포함)**
+  <audio controls src="data_sample/noisy_1.wav"></audio>
+  [다운로드](data_sample/noisy_1.wav)
+
+- **Denoised (처리 후)**
+  <audio controls src="data_sample/denoise_1.wav"></audio>
+  [다운로드](data_sample/denoise_1.wav)
 
 ### Sample 2
-- **Clean (원본)**: [clean_2.wav](data_sample/clean_2.wav)
-- **Noisy (노이즈 포함)**: [noisy_2.wav](data_sample/noisy_2.wav)
-- **Denoised (처리 후)**: [denoise_2.wav](data_sample/denoise_2.wav)
-```
+- **Clean (원본)**
+  <audio controls src="data_sample/clean_2.wav"></audio>
+  [다운로드](data_sample/clean_2.wav)
+
+- **Noisy (노이즈 포함)**
+  <audio controls src="data_sample/noisy_2.wav"></audio>
+  [다운로드](data_sample/noisy_2.wav)
+
+- **Denoised (처리 후)**
+  <audio controls src="data_sample/denoise_2.wav"></audio>
+  [다운로드](data_sample/denoise_2.wav)
