@@ -15,6 +15,10 @@ PPO 알고리즘을 기반으로, 다양한 고전적 DSP denoiser(Wiener, Spect
 ```
 HEAR/
 ├── Dockerfile                  # Docker 환경 설정
+├── .dockerignore               # Docker 빌드 제외 파일
+├── .gitignore                  # Git 제외 파일
+├── README.md                   # 프로젝트 문서
+├── hear_images.png             # 프로젝트 개요 이미지
 ├── inference.py                # 학습된 모델로 추론
 ├── run_experiments.py          # 실험 실행 스크립트
 ├── rl/                         # RL 관련 모듈
@@ -25,15 +29,22 @@ HEAR/
 │   └── dataset.py              # 데이터셋 로딩
 ├── utils/                      # 유틸리티 모듈
 │   ├── __init__.py
-│   ├── extract_features.py    # 오디오 특징 추출
+│   ├── extract_features.py     # 오디오 특징 추출
+│   ├── mix_noisy_dataset.py    # 노이즈와 Clean Speech 혼합
 │   └── denoise_metrics.py      # Denoising 성능 평가
 ├── train_data/                 # 학습 데이터
-│   ├── clean/                  # Clean 오디오 파일
-│   ├── noisy/                  # Noisy 오디오 파일
-│   ├── meta.csv                # 메타데이터
+│   ├── train/
+│   │   ├── clean/              # Clean 오디오 파일
+│   │   ├── noisy/              # Noisy 오디오 파일
+│   │   └── meta.csv            # 메타데이터
 │   └── train_state_features.csv # 추출된 특징 데이터
+├── data_sample/                # 오디오 샘플 예시
+│   ├── clean_1.wav
+│   ├── noisy_1.wav
+│   ├── denoise_1.wav
+│   └── ...
 ├── runs/                       # 학습 결과 저장 (학습시 생성)
-│   └── rl_train/               # 기본 학습 결과 저장 경로 (학습시 생성)
+│   └── experiments/            # 실험별 결과 저장 경로
 └── weight/                     # 미리 학습된 모델 가중치
 ```
 
@@ -44,8 +55,6 @@ HEAR/
 - **SNR 0 dB:** SI-SDR ≈ 5.7 dB (noisy 대비: -0.02 dB)
 - **SNR 5 dB:** SI-SDR ≈ 9.2 dB (noisy 대비: 5.01 dB)
 - **SNR 10 dB:** SI-SDR ≈ 14.4 dB (noisy 대비: 10.03 dB)
-
-Intelligibility 가중치를 사용한 실험 결과, 낮은/중간 SNR에서는 **음질-명료도 트레이드오프**가 관찰되었으며, 높은 SNR에서는 SI-SDR과 STOI가 동시에 개선되었습니다.
 
 ## 🎵 오디오 예시
 
@@ -94,34 +103,7 @@ AI Hub의 라이선스 정책에 따라 KsponSpeech 오디오를 포함한 혼�
 
 1. [AI Hub](https://www.aihub.or.kr/)에서 KsponSpeech 데이터셋 다운로드
 2. [ESC-50](https://github.com/karolpiczak/ESC-50) 노이즈 데이터셋 다운로드
-3. 제공된 스크립트를 사용하여 clean/noisy 데이터셋 생성
-
-**Step 1: 노이즈와 Clean Speech 섞기**
-
-```bash
-python utils/mix_noisy_dataset.py \
-    --clean-root KsponSpeech_01 \
-    --noise-root noise_select \
-    --output-root train_data \
-    --split train \
-    --snr-db 0,5,10 \
-    --seed 1337 \
-    --esc50-meta esc50-meta.xlsx
-```
-
-**주요 옵션:**
-- `--clean-root`: KsponSpeech 데이터 루트 디렉토리 (기본: `KsponSpeech_01`)
-- `--noise-root`: ESC-50 노이즈 디렉토리 (기본: `noise_select`)
-- `--output-root`: 출력 디렉토리 (기본: `data_mixed`)
-- `--split`: 데이터셋 분할 (기본: `train`)
-- `--snr-db`: SNR 값들 (기본: `0,5,10`)
-- `--clean-limit`: 처리할 clean 파일 수 제한 (0 = 전체)
-- `--esc50-meta`: ESC-50 메타데이터 파일 (선택사항)
-
-**출력:**
-- `train_data/train/clean/`: Clean 오디오 파일
-- `train_data/train/noisy/`: Noisy 오디오 파일
-- `train_data/train/meta.csv`: 메타데이터 (utt_id, clean_path, noisy_path, clean_source, noise_source, snr_db, duration_sec 등)
+3. 유틸리티 섹션의 "데이터셋 생성"을 참고하여 clean/noisy 데이터셋 생성
 
 ### 2. Docker 환경 설정
 
@@ -215,7 +197,38 @@ python inference.py \
 
 ## 🔧 유틸리티 (Utils)
 
-### 1. 특징 추출 (Feature Extraction)
+### 1. 데이터셋 생성 (Dataset Creation)
+
+KsponSpeech clean 오디오와 ESC-50 노이즈를 혼합하여 학습용 데이터셋을 생성합니다.
+
+```bash
+python utils/mix_noisy_dataset.py \
+    --clean-root KsponSpeech_01 \
+    --noise-root noise_select \
+    --output-root train_data \
+    --split train \
+    --snr-db 0,5,10 \
+    --seed 1337 \
+    --esc50-meta esc50-meta.xlsx
+```
+
+**주요 옵션:**
+- `--clean-root`: KsponSpeech 데이터 루트 디렉토리 (기본: `KsponSpeech_01`)
+- `--noise-root`: ESC-50 노이즈 디렉토리 (기본: `noise_select`)
+- `--output-root`: 출력 디렉토리 (기본: `data_mixed`)
+- `--split`: 데이터셋 분할 (기본: `train`)
+- `--snr-db`: SNR 값들 (기본: `0,5,10`)
+- `--clean-limit`: 처리할 clean 파일 수 제한 (0 = 전체)
+- `--esc50-meta`: ESC-50 메타데이터 파일 (선택사항)
+- `--seed`: 랜덤 시드 (기본: 1337)
+- `--target-sr`: 타겟 샘플레이트 (기본: 16000)
+
+**출력:**
+- `train_data/train/clean/`: Clean 오디오 파일
+- `train_data/train/noisy/`: Noisy 오디오 파일
+- `train_data/train/meta.csv`: 메타데이터 (utt_id, clean_path, noisy_path, clean_source, noise_source, snr_db, duration_sec 등)
+
+### 2. 특징 추출 (Feature Extraction)
 
 오디오 파일에서 RL 상태 입력용 특징을 추출합니다.
 
@@ -247,7 +260,7 @@ python utils/extract_features.py \
 - `--hop-length`: Hop length (기본: 256)
 - `--limit`: 처리할 파일 수 제한 (기본: 전체)
 
-### 2. 성능 평가 (Metrics Evaluation)
+### 3. 성능 평가 (Metrics Evaluation)
 
 Denoising 전후의 메트릭을 비교합니다.
 
