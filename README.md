@@ -18,7 +18,7 @@ RL_prj_release/
 ├── utils/                      # 유틸리티 모듈
 │   ├── __init__.py
 │   ├── extract_features.py    # 오디오 특징 추출
-│   └── denoise_metrics.py     # Denoising 성능 평가
+│   └── denoise_metrics.py      # Denoising 성능 평가
 ├── train_data/                 # 학습 데이터
 │   ├── clean/                  # Clean 오디오 파일
 │   ├── noisy/                  # Noisy 오디오 파일
@@ -63,30 +63,7 @@ train_data/
 
 ## 📝 주요 스크립트 사용법
 
-### 1. 특징 추출 (Feature Extraction)
-
-오디오 파일에서 RL 상태 입력용 특징을 추출합니다.
-
-```bash
-python utils/extract_features.py \
-    --meta-path train_data/meta.csv \
-    --output-path train_data/train_state_features.csv \
-    --target-sr 16000 \
-    --n-mels 64 \
-    --n-fft 1024 \
-    --hop-length 256
-```
-
-**주요 옵션:**
-- `--meta-path`: 메타데이터 CSV 파일 경로 (기본: `data_mixed/train/meta.csv`)
-- `--output-path`: 출력 특징 CSV 파일 경로 (기본: `features/train_state_features.csv`)
-- `--target-sr`: 타겟 샘플레이트 (기본: 16000)
-- `--n-mels`: Mel 스펙트로그램 밴드 수 (기본: 64)
-- `--n-fft`: FFT 크기 (기본: 1024)
-- `--hop-length`: Hop length (기본: 256)
-- `--limit`: 처리할 파일 수 제한 (기본: 전체)
-
-### 2. RL 에이전트 학습 (Training)
+### 1. RL 에이전트 학습 (Training)
 
 PPO, SAC, TD3 알고리즘으로 denoising 에이전트를 학습합니다.
 
@@ -120,7 +97,7 @@ PYTHONPATH=/workspace python rl/train_agent.py \
 
 **주요 옵션:**
 - `--algo`: 알고리즘 선택 (`ppo`, `sac`, `td3`, 기본: `ppo`)
-- `--features`: 특징 CSV 파일 경로 (기본: `features/train_state_features.csv`)
+- `--features`: 특징 CSV 파일 경로 (기본: `train_data/train_state_features.csv`)
 - `--total-steps`: 총 학습 스텝 수 (기본: 200000)
 - `--max-steps`: 에피소드당 최대 denoising 스텝 (기본: 3)
 - `--reward-scale`: 보상 스케일 (기본: 5.0)
@@ -143,7 +120,7 @@ PYTHONPATH=/workspace python rl/train_agent.py \
 - `--warmup-steps`: 워밍업 스텝 수 (기본: 4000)
 - `--tau`: 타겟 네트워크 업데이트 계수 (기본: 0.005)
 
-### 3. 실험 실행 (Experiment Runner)
+### 2. 실험 실행 (Experiment Runner)
 
 여러 하이퍼파라미터 조합으로 실험을 순차적으로 실행합니다.
 
@@ -184,7 +161,7 @@ python run_experiments.py \
 - `--wandb-project`: Weights & Biases 프로젝트 이름
 - `--output-root`: 결과 저장 루트 디렉토리 (기본: `runs/experiments`)
 
-### 4. 추론 (Inference)
+### 3. 추론 (Inference)
 
 학습된 모델로 noisy 오디오를 denoising합니다.
 
@@ -229,7 +206,41 @@ python inference.py \
 - 여러 체크포인트 사용 시: `denoised_output__{tag}.wav` 형식으로 저장
 - Clean reference가 제공되면 SI-SDR, STOI, ESTOI 메트릭 출력
 
-### 5. 성능 평가 (Metrics Evaluation)
+## 🔧 유틸리티 (Utils)
+
+### 1. 특징 추출 (Feature Extraction)
+
+오디오 파일에서 RL 상태 입력용 특징을 추출합니다.
+
+```bash
+python utils/extract_features.py \
+    --meta-path train_data/meta.csv \
+    --output-path train_data/train_state_features.csv \
+    --target-sr 16000 \
+    --n-mels 64 \
+    --n-fft 1024 \
+    --hop-length 256
+```
+
+**중요:** `meta.csv` 파일은 다음 구조를 가져야 합니다:
+- `utt_id`: 발화 ID
+- `clean_path`: Clean 오디오 파일 경로 (상대 경로)
+- `noisy_path`: Noisy 오디오 파일 경로 (상대 경로)
+- `clean_source`: Clean 오디오 소스 정보
+- `noise_source`: 노이즈 소스 정보
+- `snr_db`: SNR 값 (dB)
+- `duration_sec`: 오디오 길이 (초)
+
+**주요 옵션:**
+- `--meta-path`: 메타데이터 CSV 파일 경로 (기본: `train_data/meta.csv`)
+- `--output-path`: 출력 특징 CSV 파일 경로 (기본: `train_data/train_state_features.csv`)
+- `--target-sr`: 타겟 샘플레이트 (기본: 16000)
+- `--n-mels`: Mel 스펙트로그램 밴드 수 (기본: 64)
+- `--n-fft`: FFT 크기 (기본: 1024)
+- `--hop-length`: Hop length (기본: 256)
+- `--limit`: 처리할 파일 수 제한 (기본: 전체)
+
+### 2. 성능 평가 (Metrics Evaluation)
 
 Denoising 전후의 메트릭을 비교합니다.
 
@@ -246,8 +257,8 @@ python utils/denoise_metrics.py \
 
 **주요 옵션:**
 - `--checkpoint`: 평가할 모델 체크포인트 (여러 개 가능)
-- `--meta`: 메타데이터 CSV (기본: `data_mixed/train/meta.csv`)
-- `--train-features`: 학습 시 사용한 특징 CSV (기본: `features/train_state_features.csv`)
+- `--meta`: 메타데이터 CSV (기본: `train_data/meta.csv`)
+- `--train-features`: 학습 시 사용한 특징 CSV (기본: `train_data/train_state_features.csv`)
 - `--sample-size`: 평가할 샘플 수 (0 = 전체, 기본: 100)
 - `--snr-db`: 평가할 SNR 값들 (여러 개 지정 가능)
 - `--seed`: 샘플링 시드 (기본: 0)
@@ -293,98 +304,3 @@ python utils/denoise_metrics.py \
     --train-features train_data/train_state_features.csv \
     --sample-size 100
 ```
-
-## 🔧 환경 요구사항
-
-### Python 패키지
-- PyTorch >= 2.2.0 (CUDA 지원)
-- librosa >= 0.10.1
-- soundfile >= 0.12.1
-- numpy >= 1.24.0
-- scipy >= 1.10.0
-- pandas >= 2.0.0
-- scikit-learn >= 1.3.0
-- pystoi >= 0.3.3
-- pesq >= 0.0.4
-- torch-audiomentations >= 0.11.0
-- stable-baselines3 >= 2.0.0
-- tensorboard >= 2.13.0
-- matplotlib >= 3.7.0
-- tqdm >= 4.65.0
-- wandb >= 0.15.0
-
-### 시스템 요구사항
-- CUDA 지원 GPU (권장)
-- FFmpeg
-- libsndfile
-
-모든 패키지는 `Dockerfile`에 정의되어 있습니다.
-
-## 📊 출력 파일
-
-### 학습 중 생성되는 파일
-- `runs/rl_train/model.pt`: 학습된 모델 체크포인트
-- `runs/rl_train/args.json`: 학습 하이퍼파라미터
-- `runs/rl_train/metrics.json`: 학습 메트릭
-- `runs/experiments/{experiment_name}/{timestamp}/model.pt`: run_experiments.py 사용 시
-
-### 추론 결과
-- Denoised 오디오 파일 (.wav)
-- 메트릭 정보 (콘솔 출력)
-
-### 평가 결과
-- 메트릭 CSV 파일
-- 플롯 이미지 (지정 시)
-- Denoised 오디오 파일 (지정 시)
-
-## 📌 주요 기능
-
-### Denoising 방법
-프로젝트는 다음 6가지 denoising 방법을 지원합니다:
-1. **Spectral Subtraction**: 스펙트럼 차감
-2. **Wiener Filter**: 위너 필터
-3. **Spectral Gate**: 스펙트럼 게이트
-4. **MMSE-LSA**: 최소 평균 제곱 오차 기반 스펙트럼 추정
-5. **NMF Denoising**: 비음수 행렬 분해 기반 노이즈 제거
-6. **Wavelet Denoising**: 웨이블릿 변환 기반 노이즈 제거
-
-RL 에이전트는 각 스텝에서 최적의 방법과 파라미터(strength, smoothing, bandmix)를 선택합니다.
-
-### 평가 메트릭
-- **SI-SDR**: Scale-Invariant Signal-to-Distortion Ratio
-- **STOI**: Short-Time Objective Intelligibility
-- **ESTOI**: Extended STOI
-
-## 🐛 문제 해결
-
-### Import 에러
-```bash
-# 모듈로 실행 (권장)
-python -m rl.train_agent ...
-
-# 또는 PYTHONPATH 설정
-PYTHONPATH=/workspace python rl/train_agent.py ...
-```
-
-### CUDA 관련 오류
-```bash
-# CUDA 사용 불가 시 CPU로 강제 전환
-python -m rl.train_agent --device cpu ...
-```
-
-### 파일 경로 에러
-- `meta.csv`의 `clean_path`와 `noisy_path`가 `train_data/` 기준 상대 경로인지 확인
-- 파일이 실제로 존재하는지 확인
-
-### 메모리 부족
-- `--batch-size` 줄이기
-- `--rollout-steps` 줄이기
-- `--update-epochs` 줄이기
-
-## 📚 참고
-
-- 학습 로그는 Weights & Biases에서 확인 가능 (지정 시)
-- 모델 체크포인트는 `runs/` 디렉토리에 저장됨
-- 각 실험은 타임스탬프가 포함된 고유 디렉토리에 저장됨
-- Docker 컨테이너 내에서 작업할 때는 `/workspace` 디렉토리를 사용
-
