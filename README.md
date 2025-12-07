@@ -176,6 +176,18 @@ python -m rl.train_agent \
 
 학습된 모델로 noisy 오디오를 denoising합니다.
 
+**⚠️ 사전 준비: 추론을 위해 `train_state_features.csv` 파일이 필요합니다.**
+
+```bash
+# train_data 폴더 생성
+mkdir -p train_data
+
+# train_state_features.csv 다운로드
+# [구글 드라이브 링크] : (https://drive.google.com/file/d/1SyVshw1pzwBIKdH4u63Fb27c8EXeLp9S/view?usp=sharing)
+# 다운로드 후 train_data/ 폴더에 넣어주세요
+```
+
+
 ```bash
 # 단일 모델 추론
 python inference.py \
