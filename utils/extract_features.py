@@ -86,13 +86,13 @@ def main() -> None:
     parser.add_argument(
         "--meta-path",
         type=Path,
-        default=Path("train_data/meta.csv"),
+        default=Path("data_mixed/train/meta.csv"),
         help="Path to mixing meta CSV (default: %(default)s)",
     )
     parser.add_argument(
         "--output-path",
         type=Path,
-        default=Path("train_data/train_state_features.csv"),
+        default=Path("features/train_state_features.csv"),
         help="Where to save extracted features (default: %(default)s)",
     )
     parser.add_argument("--target-sr", type=int, default=16000)
