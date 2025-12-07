@@ -105,7 +105,14 @@ AI Hub의 라이선스 정책에 따라 KsponSpeech 오디오를 포함한 혼�
 2. [ESC-50](https://github.com/karolpiczak/ESC-50) 노이즈 데이터셋 다운로드
 3. 유틸리티 섹션의 "데이터셋 생성"을 참고하여 clean/noisy 데이터셋 생성
 
-### 2. Docker 환경 설정
+### 2. 저장소 클론
+
+```bash
+git clone https://github.com/ksb625/HEAR.git
+cd HEAR
+```
+
+### 3. Docker 환경 설정
 
 ```bash
 # Docker 이미지 빌드
